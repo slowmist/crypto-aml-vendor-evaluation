@@ -1,160 +1,256 @@
-# Crypto AML 供应商评估 Checklist 与执行指南
+# Crypto AML Vendor Evaluation Checklist & Implementation Guide
 
-作为专注区块链生态安全的威胁情报公司，慢雾 (SlowMist) 在长期的黑客追踪与反洗钱（AML）实战中发现，选择合适的 AML 供应商不仅关系到合规要求的满足，也直接影响机构应对黑灰产资金风险的能力。
 
-本指南基于慢雾的威胁情报沉淀及反洗钱追踪经验，参考 FATF、Wolfsberg Group 及主要司法管辖区（如 FinCEN, HKMA, MAS）的要求，旨在为行业提供一套兼具合规性与实战性的 Crypto AML 供应商评估标准。
+*Read this in other languages: [English](README.md), [简体中文](README_CN.md).*
 
-## 1. 评估目标
-确保供应商不仅满足基础的监管报告要求，更要在复杂的技术对抗中（如混币、跨链、洗钱攻击）具备高精度的风险识别能力，实现低误报与低漏报的平衡。
+As a threat intelligence company focused on blockchain ecosystem security, SlowMist has found through long-term hacker tracking and anti-money laundering (AML) practices that selecting the right AML vendor is not only critical for meeting compliance requirements, but also directly impacts an institution’s ability to manage illicit fund risks.
 
----
+Based on SlowMist’s accumulated threat intelligence and AML tracing experience, and with reference to requirements from the FATF, the Wolfsberg Group, and major jurisdictions (such as FinCEN, HKMA, and MAS), this guide aims to provide the industry with a Crypto AML vendor evaluation framework that balances compliance and real-world effectiveness.
 
-## 2. 核心功能评估
+## 1. Evaluation Objectives
 
-### 2.1 制裁名单与黑名单筛查
-*核心关注点：数据的实时性、覆盖面及模糊匹配算法的精准度。*
-
-- [ ] **名单覆盖范围**：
-    - 是否覆盖全球主要制裁名单（OFAC, UN, EU, UK HMT, DFAT 等）？
-    - 是否包含加密资产相关的黑名单（如 OFAC 标注的加密地址、黑客攻击相关地址、暗网地址）？
-- [ ] **更新频率**：
-    - 名单更新是否为实时或至少每日更新？
-    - 供应商对突发制裁事件（如地缘政治冲突导致的紧急制裁）的响应时间是多少？
-- [ ] **匹配算法**：
-    - 是否支持模糊匹配以处理拼写错误、别名或变体？
-    - 是否支持调整匹配阈值以平衡误报率？
-- [ ] **聚类能力**：
-    - 能否识别受制裁实体的关联地址？
-
-### 2.2 链上交易监控
-*核心关注点：风险归因的准确性及对资金流向的追踪能力。*
-
-- [ ] **资产覆盖**：
-    - 是否覆盖主流公链（BTC, ETH, Solana, Tron 等）及 Layer 2？
-    - 是否支持主流代币（ERC-20、TRC-20 等）的监控？
-- [ ] **风险评分模型**：
-    - 是否基于多维度（直接风险 vs 间接/穿透风险）？
-    - 是否支持跳数分析？（例如：资金经过 5 层跳跃后到达高风险实体，系统能否识别？）
-- [ ] **实体识别**：
-    - 数据库中已标记实体的数量和质量（交易所、混币器、暗网市场、勒索软件、DeFi 协议等）。
-    - 标签更新的机制是什么？（人工情报/机器自动抓取）。
-- [ ] **DeFi 与 NFT 监控**：
-    - 是否具备针对 DEX、流动性池、跨链桥的特定监控规则？
-    - 能否识别 NFT 洗钱模式（如清洗交易）？
-- [ ] **规则引擎灵活性**：
-    - 用户能否自定义监控规则（例如：单笔 > 1 BTC 且来自高风险地区）？
-
-### 2.3 资金来源与去向分析
-- [ ] **资金溯源**：
-    - 是否提供可视化的资金链路图谱？
-    - 是否可识别混币行为与分层转移模式（注：完全穿透很难，但需具备识别尝试混币行为的能力）。
-- [ ] **Travel Rule (旅行规则) 支持**：
-    - 是否集成了 IVMS 101 标准？
-    - 是否支持主流的 Travel Rule 协议（如 TRISA, Sygna, VerifyVASP）？
-
-### 2.4 持续监控与自动复筛
-*核心关注点：历史交易或地址在底层标签/风险状态发生变化时的追溯能力。*
-
-- [ ] **触发机制**：
-    - 当某地址关联的实体标签从“低风险”变更为“高风险/制裁”时，系统能否自动重算该地址历史交易的风险分？
-    - 基础数据源或黑名单（如 OFAC）更新后，系统能在多长时间内完成受影响历史数据的自动重新扫描？
-- [ ] **影响范围与穿透深度**：
-    - 复筛是否会向下游扩散（基于设定的跳数），并在历史子节点上触发追溯警报？
-- [ ] **警报降噪**：
-    - 系统产生的回溯警报是否与实时新发警报有明显的区分，或者具有独立的案件优先级管理逻辑？（避免淹没正常预警）。
-
-### 2.5 报告与案件管理
-- [ ] **SAR/STR 辅助生成**：
-    - 是否能自动生成可疑活动报告（SAR）所需的交易数据摘要？
-    - 报告格式是否符合当地监管机构（如 FinCEN, JFIU）的要求？
-- [ ] **审计线索**：
-    - 系统的所有操作（警报处理、备注、白名单添加）是否有不可篡改的日志记录？
-- [ ] **API 集成能力**：
-    - API 文档是否完善？
-    - 吞吐量（TPS）是否满足业务高峰需求？
-
-### 2.6 数据隐私与安全性
-- [ ] **认证资质**：是否有 SOC 2 Type II, ISO 27001 等认证？
-- [ ] **数据部署**：是否支持本地化部署或私有云（针对极高合规要求的机构）？
+Ensure that the vendor not only meets basic regulatory reporting requirements, but also possesses high-precision risk identification capabilities in complex adversarial scenarios (e.g., mixing, cross-chain transactions, and laundering attacks), achieving a balance between low false positives and low false negatives.
 
 ---
 
-## 3. 评估执行方法
+## 2. Core Capability Evaluation
 
-为避免仅依赖供应商演示环境，建议采取以下 **POC (Proof of Concept)** 流程进行实测：
+### 2.1 Sanctions & Blacklist Screening
 
-### 第一阶段：静态数据测试
-**目的**：测试数据库的覆盖率和标签准确性。
+*Key focus: data timeliness, coverage, and the accuracy of fuzzy matching algorithms.*
 
-#### 1. **准备数据集**
-##### （1）已知高风险地址集
-*用于评估系统对黑客、制裁对象及犯罪相关地址的识别能力。*
-**数据来源示例：**
-- **制裁与风险实体数据库**
-  - OpenSanctions — CryptoWallet 数据集  
+- [ ] **Coverage Scope**
+  - Does it cover major global sanctions lists (OFAC, UN, EU, UK HMT, DFAT, etc.)?
+  - Does it include crypto-related blacklists (e.g., OFAC-designated crypto addresses, hacker-related addresses, darknet addresses)?
+
+- [ ] **Update Frequency**
+  - Are lists updated in real time or at least daily?
+  - How quickly does the vendor respond to emergency sanctions events (e.g., geopolitical conflicts triggering urgent sanctions)?
+
+- [ ] **Matching Algorithms**
+  - Does it support fuzzy matching to handle misspellings, aliases, or variations?
+  - Can matching thresholds be adjusted to balance false positives?
+
+- [ ] **Clustering Capability**
+  - Can it identify associated addresses linked to sanctioned entities?
+
+---
+
+### 2.2 On-chain Transaction Monitoring
+
+*Key focus: accuracy of risk attribution and fund flow tracing capability.*
+
+- [ ] **Asset Coverage**
+  - Does it support major public blockchains (BTC, ETH, Solana, Tron, etc.) and Layer 2 networks?
+  - Does it support mainstream token standards (ERC-20, TRC-20, etc.)?
+
+- [ ] **Risk Scoring Model**
+  - Is it based on multi-dimensional analysis (direct risk vs. indirect/propagated risk)?
+  - Does it support hop-based analysis? (e.g., can it detect funds reaching a high-risk entity after multiple hops?)
+
+- [ ] **Entity Identification**
+  - What is the scale and quality of labeled entities (exchanges, mixers, darknet markets, ransomware, DeFi protocols, etc.)?
+  - How are labels updated? (manual intelligence vs. automated ingestion)
+
+- [ ] **DeFi & NFT Monitoring**
+  - Are there dedicated monitoring rules for DEXs, liquidity pools, and cross-chain bridges?
+  - Can it identify NFT-related laundering patterns (e.g., wash trading)?
+
+- [ ] **Rule Engine Flexibility**
+  - Can users define custom monitoring rules (e.g., single transaction > 1 BTC AND from high-risk jurisdictions)?
+
+---
+
+### 2.3 Source & Destination of Funds Analysis
+
+- [ ] **Fund Tracing**
+  - Does it provide visualized fund flow graphs?
+  - Can it detect mixing behavior and layering patterns?  
+    *(Note: full de-anonymization is difficult, but detection capability is essential.)*
+
+- [ ] **Travel Rule Support**
+  - Does it support IVMS 101 standards?
+  - Does it integrate with major Travel Rule protocols (e.g., TRISA, Sygna, VerifyVASP)?
+
+---
+
+### 2.4 Continuous Monitoring & Automatic Re-screening
+
+*Key focus: retrospective risk recalculation when underlying data changes.*
+
+- [ ] **Trigger Mechanism**
+  - When an address’s associated entity label changes from “low risk” to “high risk/sanctioned,” can the system automatically recalculate historical transaction risk scores?
+  - After updates to underlying data sources or sanctions lists (e.g., OFAC), how quickly can the system re-scan affected historical data?
+
+- [ ] **Scope & Propagation Depth**
+  - Does re-screening propagate downstream (based on configurable hop levels) and trigger retrospective alerts?
+
+- [ ] **Alert Noise Reduction**
+  - Are retrospective alerts clearly distinguished from real-time alerts, or managed under separate case priorities?  
+    *(to avoid overwhelming normal alert workflows)*
+
+---
+
+### 2.5 Reporting & Case Management
+
+- [ ] **SAR/STR Assistance**
+  - Can it automatically generate transaction summaries required for Suspicious Activity Reports (SAR)?
+  - Do report formats comply with local regulators (e.g., FinCEN, JFIU)?
+
+- [ ] **Audit Trail**
+  - Are all system actions (alert handling, notes, whitelist changes) immutably logged?
+
+- [ ] **API Integration**
+  - Is the API documentation complete and clear?
+  - Can throughput (TPS) support peak business demand?
+
+---
+
+### 2.6 Data Privacy & Security
+
+- [ ] **Certifications**
+  - Does it hold certifications such as SOC 2 Type II, ISO 27001?
+
+- [ ] **Deployment Options**
+  - Does it support on-premise or private cloud deployment (for institutions with strict compliance requirements)?
+
+---
+
+## 3. Evaluation Methodology
+
+To avoid relying solely on vendor demo environments, it is recommended to conduct a **POC (Proof of Concept)** using the following approach:
+
+---
+
+### Phase 1: Static Data Testing
+
+**Objective**: Evaluate database coverage and labeling accuracy.
+
+#### 1. Prepare Datasets
+
+##### (1) Known High-Risk Address Set
+
+*Used to evaluate the system’s ability to identify hackers, sanctioned entities, and illicit addresses.*
+
+**Example data sources:**
+
+- **Sanctions & Risk Entity Databases**
+  - OpenSanctions — CryptoWallet dataset  
     https://www.opensanctions.org/search/?schema=CryptoWallet  
-- **已公开黑客攻击与盗窃事件地址**
-  - Lazarus / Bluenoroff 攻击研究库  
+
+- **Public Hack & Theft Address Repositories**
+  - Lazarus / Bluenoroff research  
     https://github.com/tayvano/lazarus-bluenoroff-research/tree/main/hacks-and-thefts  
   - ScamSniffer Scam Database  
-    https://github.com/scamsniffer/scam-database/tree/main/blacklist
-##### （2）已知安全地址集
-*用于评估误报率，即系统是否错误地将正常地址标记为高风险。*
-**数据来源示例：**
-- **链上情报平台标注的主流中心化交易所热钱包地址**
-  - Arkham Intelligence — CEX 标签  
+    https://github.com/scamsniffer/scam-database/tree/main/blacklist  
+
+---
+
+##### (2) Known Clean Address Set
+
+*Used to evaluate false positives (i.e., incorrectly flagged legitimate addresses).*
+
+**Example data sources:**
+
+- **Tagged CEX Addresses**
+  - Arkham Intelligence — CEX labels  
     https://intel.arkm.com/tags/cex  
-- **区块浏览器官方标签**
-  - 区块浏览器（如 Etherscan）标注的交易所地址  
-##### （3）灰度地址集
-*用于评估系统对“风险倾向”而非“确定违法”地址的识别能力。*
-**典型包括：**
-- **赌博平台相关地址**
-  - Etherscan 赌博标签地址  
-    https://etherscan.io/accounts/label/gambling  
-- **高风险交易所或监管关注对象**
-- **混币服务交互地址**  
-#### 2.  **执行测试**：
--   将上述地址导入供应商系统。
-#### 3.  **评估指标**：
--   **Recall (召回率)**：多少高风险地址被成功识别？
--   **False Positive Rate (误报率)**：多少安全地址被误报为高风险？
 
-### 第二阶段：动态交易监控测试
-**目的**：测试规则引擎的灵活性和实时性。
-1.  **模拟场景**：
-    -   **场景 A：结构化交易**：在短时间内生成多笔略低于报告阈值的交易。
-    -   **场景 B：混币交互**：发送小额资金到 Tornado Cash 等混币合约，再转出。
-    -   **场景 C：多跳风险传播**：从高风险地址转账 -> 中间地址 A -> 中间地址 B -> 你的测试地址。
-2.  **执行测试**：
-    -   在测试网或主网进行实际转账。
-3.  **评估指标**：
-    -   **警报延迟**：交易上链后多久收到警报？
-    -   **风险传导**：系统能否识别场景 C 中的间接风险？
-
-### 第三阶段：API 与集成测试
-**目的**：评估落地可行性。
-1.  **压力测试**：模拟高并发请求，观察响应时间和错误率。
-2.  **故障恢复**：模拟 API 中断，测试系统的重试机制和数据一致性。
-
-### 第四阶段：尽职调查
-1.  **行业声誉与案例**：要求供应商提供 2–3 个来自相同业务类型或规模相近机构的客户案例。
-2.  **监管关系**：询问供应商是否与监管机构有直接合作（这通常意味着其数据被监管认可）。
+- **Blockchain Explorer Labels**
+  - Exchange-tagged addresses (e.g., Etherscan)
 
 ---
 
-## 4. 评分卡示例
+##### (3) Grey Address Set
 
-| 评估维度 | 权重 | 供应商 A 得分 (1-10) | 供应商 B 得分 (1-10) | 备注 |
-| :--- | :--- | :--- | :--- | :--- |
-| **数据质量** | 30% | | | 标签准确度、更新速度 |
-| **功能完备性** | 25% | | | 聚类分析、跨链追踪 |
-| **易用性** | 15% | | | UI/UX、案件管理流程 |
-| **技术性能** | 15% | | | API 延迟、稳定性 |
-| **成本** | 10% | | | 初始费用、API 调用费 |
-| **服务支持** | 5% | | | 响应速度、培训支持 |
-| **总分** | **100%** | | | |
+*Used to evaluate detection of “risk tendency” rather than confirmed illicit activity.*
+
+**Typical categories:**
+
+- Gambling-related addresses  
+  https://etherscan.io/accounts/label/gambling  
+
+- High-risk exchanges or regulatory watchlist entities  
+
+- Mixer interaction addresses  
 
 ---
 
-> **写在最后**: 尽管各机构的业务模式、监管要求和风险暴露程度存在显著差异，不存在标准化的“最佳”方案，但底层风险控制逻辑是相通的。基于慢雾（SlowMist）的一线威胁情报沉淀与反洗钱追踪经验，我们提炼出这套评估标准，希望能帮助企业筛选出既能满足合规需求，又能抵御复杂链上风险的 AML 供应商。
+#### 2. Execute Testing
+
+- Import the above datasets into the vendor system.
+
+#### 3. Evaluation Metrics
+
+- **Recall**: How many high-risk addresses are correctly identified?
+- **False Positive Rate**: How many clean addresses are incorrectly flagged?
+
+---
+
+### Phase 2: Dynamic Transaction Monitoring Testing
+
+**Objective**: Evaluate rule engine flexibility and real-time performance.
+
+#### 1. Simulated Scenarios
+
+- **Scenario A: Structuring**
+  - Generate multiple transactions slightly below reporting thresholds within a short period.
+
+- **Scenario B: Mixer Interaction**
+  - Send small amounts to mixer contracts (e.g., Tornado Cash) and withdraw.
+
+- **Scenario C: Multi-hop Risk Propagation**
+  - High-risk address → intermediary A → intermediary B → your test address
+
+#### 2. Execute Testing
+
+- Conduct real transactions on testnet or mainnet.
+
+#### 3. Evaluation Metrics
+
+- **Alert Latency**: How long after confirmation is an alert triggered?
+- **Risk Propagation**: Can indirect risk in Scenario C be detected?
+
+---
+
+### Phase 3: API & Integration Testing
+
+**Objective**: Evaluate production readiness.
+
+- **Stress Testing**
+  - Simulate high-concurrency requests and observe latency and error rates.
+
+- **Failure Recovery**
+  - Simulate API interruptions and evaluate retry mechanisms and data consistency.
+
+---
+
+### Phase 4: Due Diligence
+
+- **Industry Reputation & Case Studies**
+  - Request 2–3 customer cases from similar business types or scales.
+
+- **Regulatory Engagement**
+  - Ask whether the vendor has direct cooperation with regulators  
+    *(this often indicates regulatory acceptance of their data)*
+
+---
+
+## 4. Sample Scoring Card
+
+| Evaluation Dimension | Weight | Vendor A Score (1–10) | Vendor B Score (1–10) | Notes |
+|---------------------|--------|----------------------|----------------------|-------|
+| **Data Quality** | 30% | | | Label accuracy, update speed |
+| **Feature Completeness** | 25% | | | Clustering, cross-chain tracing |
+| **Usability** | 15% | | | UI/UX, case workflow |
+| **Technical Performance** | 15% | | | API latency, stability |
+| **Cost** | 10% | | | Setup fees, API pricing |
+| **Support & Service** | 5% | | | Response time, training |
+| **Total** | **100%** | | | |
+
+---
+
+> **Final Note**  
+> While business models, regulatory requirements, and risk exposure vary significantly across institutions—and there is no single “best” solution—the underlying logic of risk control remains consistent.  
+>  
+> Based on SlowMist’s frontline threat intelligence and AML tracing experience, this evaluation framework is designed to help organizations identify AML vendors that not only meet compliance requirements, but also effectively defend against complex on-chain risks.
